@@ -1,0 +1,212 @@
+.map-container {
+  flex: 1;
+  position: relative;
+  height: 100%;
+}
+
+/* Custom marker styles */
+.custom-marker {
+  background: transparent;
+  border: none;
+}
+
+.marker-station {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: #2c5282;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+}
+
+.marker-station svg {
+  transform: rotate(45deg);
+  color: white;
+}
+
+.marker-station.active {
+  background: #38a169;
+}
+
+.marker-station.maintenance {
+  background: #d69e2e;
+}
+
+.marker-bin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  width: 36px;
+  height: 48px;
+  background: #4a5568;
+  border-radius: 4px 4px 8px 8px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+}
+
+.marker-bin .fill-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: currentColor;
+  opacity: 0.3;
+  transition: height 0.3s;
+}
+
+.marker-bin svg {
+  position: relative;
+  z-index: 1;
+  color: white;
+  margin-bottom: 2px;
+}
+
+.marker-bin .fill-text {
+  font-size: 10px;
+  color: white;
+  font-weight: bold;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 4px;
+}
+
+.marker-bin.ok {
+  background: #38a169;
+  color: #38a169;
+}
+
+.marker-bin.warning {
+  background: #d69e2e;
+  color: #d69e2e;
+}
+
+.marker-bin.full {
+  background: #e53e3e;
+  color: #e53e3e;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Popup styles */
+.popup-content {
+  text-align: right;
+  direction: rtl;
+  padding: 5px;
+}
+
+.popup-content h3 {
+  margin: 0 0 10px 0;
+  color: #2d3748;
+  font-size: 14px;
+}
+
+.popup-content p {
+  margin: 5px 0;
+  color: #4a5568;
+  font-size: 13px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-badge.active,
+.status-badge.ok {
+  background: #c6f6d5;
+  color: #22543d;
+}
+
+.status-badge.maintenance,
+.status-badge.warning {
+  background: #faf089;
+  color: #744210;
+}
+
+.status-badge.full {
+  background: #fed7d7;
+  color: #822727;
+}
+
+/* Legend */
+.map-legend {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  z-index: 1000;
+  direction: rtl;
+}
+
+.map-legend h4 {
+  margin: 0 0 10px 0;
+  color: #2d3748;
+  font-size: 14px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 8px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+  font-size: 12px;
+  color: #4a5568;
+}
+
+.legend-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+
+.legend-icon.station.active {
+  background: #38a169;
+  border-radius: 50%;
+}
+
+.legend-icon.station.maintenance {
+  background: #d69e2e;
+  border-radius: 50%;
+}
+
+.legend-icon.bin.ok {
+  background: #38a169;
+}
+
+.legend-icon.bin.warning {
+  background: #d69e2e;
+}
+
+.legend-icon.bin.full {
+  background: #e53e3e;
+}
+
+/* Leaflet overrides */
+.leaflet-container {
+  font-family: inherit;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+}
+
+.leaflet-popup-content {
+  margin: 10px;
+}
