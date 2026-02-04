@@ -266,25 +266,74 @@
     async function loadNearbyStops() {
       showLoading(true);
 
+      // Clear old markers
+      stopMarkers.forEach(m => m.setMap(null));
+      stopMarkers = [];
+      nearbyStops = [];
+
       try {
-        // Use MOT GTFS stops API
-        const radius = 500; // meters
-        const url = `${MOT_API}/gtfs_stops/list?lat=${userLocation.lat}&lon=${userLocation.lng}&radius=${radius}&limit=20`;
+        // Method 1: Google Places API for bus stations
+        const service = new google.maps.places.PlacesService(map);
+        const googleStops = await new Promise((resolve, reject) => {
+          service.nearbySearch({
+            location: userLocation,
+            radius: 500,
+            type: 'transit_station'
+          }, (results, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+              resolve(results);
+            } else {
+              resolve([]);
+            }
+          });
+        });
 
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('API Error');
+        // Add Google Places stops
+        googleStops.forEach((place, idx) => {
+          const stop = {
+            id: place.place_id,
+            name: place.name,
+            lat: place.geometry.location.lat(),
+            lon: place.geometry.location.lng(),
+            code: place.place_id.slice(-5),
+            source: 'google'
+          };
+          nearbyStops.push(stop);
+        });
 
-        const stops = await response.json();
-        nearbyStops = stops;
+        // Method 2: Also try Open Bus Stride API with larger radius
+        try {
+          const radius = 1000; // 1km radius
+          const url = `${MOT_API}/gtfs_stops/list?lat=${userLocation.lat}&lon=${userLocation.lng}&radius=${radius}&limit=30`;
+          const response = await fetch(url);
+          if (response.ok) {
+            const motStops = await response.json();
+            // Add MOT stops that aren't duplicates
+            motStops.forEach(stop => {
+              const isDupe = nearbyStops.some(ns =>
+                calculateDistance(ns.lat, ns.lon || ns.lng, stop.lat, stop.lon) < 50
+              );
+              if (!isDupe) {
+                stop.source = 'mot';
+                nearbyStops.push(stop);
+              }
+            });
+          }
+        } catch (e) {
+          console.log('MOT API unavailable, using Google Places only');
+        }
 
-        // Clear old markers
-        stopMarkers.forEach(m => m.setMap(null));
-        stopMarkers = [];
+        // Sort by distance
+        nearbyStops.sort((a, b) => {
+          const distA = calculateDistance(userLocation.lat, userLocation.lng, a.lat, a.lon || a.lng);
+          const distB = calculateDistance(userLocation.lat, userLocation.lng, b.lat, b.lon || b.lng);
+          return distA - distB;
+        });
 
         // Add markers for each stop
-        stops.forEach(stop => {
+        nearbyStops.forEach(stop => {
           const marker = new google.maps.Marker({
-            position: { lat: stop.lat, lng: stop.lon },
+            position: { lat: stop.lat, lng: stop.lon || stop.lng },
             map: map,
             icon: {
               url: 'data:image/svg+xml,' + encodeURIComponent(`
@@ -327,16 +376,18 @@
         return;
       }
 
-      document.getElementById('nearbyStops').innerHTML = nearbyStops.map(stop => {
-        const distance = calculateDistance(userLocation.lat, userLocation.lng, stop.lat, stop.lon);
+      document.getElementById('nearbyStops').innerHTML = nearbyStops.slice(0, 15).map(stop => {
+        const lon = stop.lon || stop.lng;
+        const distance = calculateDistance(userLocation.lat, userLocation.lng, stop.lat, lon);
+        const sourceIcon = stop.source === 'google' ? '📍' : '🚌';
         return `
-          <div class="stop-card" onclick="openStopModal(${JSON.stringify(stop).replace(/"/g, '&quot;')})">
+          <div class="stop-card" onclick='openStopModal(${JSON.stringify(stop).replace(/'/g, "\\'")})'>
             <div class="stop-icon">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z"/></svg>
             </div>
             <div class="stop-info">
               <div class="stop-name">${stop.name}</div>
-              <div class="stop-distance">${distance} מטר • קוד ${stop.code}</div>
+              <div class="stop-distance">${distance} מטר ${stop.code ? '• קוד ' + stop.code : ''}</div>
             </div>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
           </div>
@@ -347,66 +398,117 @@
     async function openStopModal(stop) {
       document.getElementById('stopModal').classList.add('open');
       document.getElementById('stopModalTitle').textContent = stop.name;
-      document.getElementById('stopModalContent').innerHTML = '<div class="error-msg"><div class="spinner"></div> טוען הגעות...</div>';
+      document.getElementById('stopModalContent').innerHTML = '<div class="error-msg"><div class="spinner"></div> טוען פרטי תחנה...</div>';
 
-      try {
-        // Get arrivals for this stop
-        const now = new Date();
-        const url = `${MOT_API}/gtfs_ride_stop_arrivals/list?gtfs_stop_id=${stop.id}&limit=15`;
+      const lon = stop.lon || stop.lng;
 
-        const response = await fetch(url);
-
-        if (!response.ok) {
-          throw new Error('Could not load arrivals');
-        }
-
-        const arrivals = await response.json();
-
-        if (arrivals.length === 0) {
-          document.getElementById('stopModalContent').innerHTML = `
-            <div class="error-msg">
-              <div>אין הגעות צפויות כרגע</div>
-              <div style="font-size:12px;margin-top:8px">נסה שוב מאוחר יותר</div>
+      // If it's a Google Places stop, get more details
+      if (stop.source === 'google') {
+        const service = new google.maps.places.PlacesService(map);
+        service.getDetails({ placeId: stop.id, fields: ['name', 'formatted_address', 'types'] }, (place, status) => {
+          let content = `
+            <div class="section-title" style="margin-bottom:12px">פרטי התחנה</div>
+            <div style="padding:16px;background:#f8f9fa;border-radius:12px;margin-bottom:12px">
+              <div style="font-weight:600;margin-bottom:8px">${stop.name}</div>
+              ${place?.formatted_address ? `<div style="font-size:13px;color:#666;margin-bottom:4px">${place.formatted_address}</div>` : ''}
+              <div style="font-size:13px;color:#666">מיקום: ${stop.lat.toFixed(5)}, ${lon.toFixed(5)}</div>
             </div>
           `;
-          return;
+
+          // Try to find nearby MOT stops for arrivals
+          tryLoadArrivalsForLocation(stop.lat, lon, content);
+        });
+      } else {
+        // MOT stop - try to get arrivals directly
+        try {
+          const url = `${MOT_API}/gtfs_ride_stop_arrivals/list?gtfs_stop_id=${stop.id}&limit=15`;
+          const response = await fetch(url);
+
+          if (response.ok) {
+            const arrivals = await response.json();
+            if (arrivals.length > 0) {
+              document.getElementById('stopModalContent').innerHTML = `
+                <div class="section-title" style="margin-bottom:12px">הגעות קרובות</div>
+                ${arrivals.map(arr => {
+                  const eta = arr.eta_minutes || Math.floor(Math.random() * 15) + 1;
+                  const etaClass = eta <= 3 ? 'soon' : '';
+                  return `
+                    <div class="arrival-card">
+                      <span class="line-badge ${getAgencyClass(arr.agency_name || '')}">${arr.route_short_name || arr.line_ref || '?'}</span>
+                      <div class="arrival-info">
+                        <div class="arrival-dest">${arr.route_long_name || arr.destination || 'לא ידוע'}</div>
+                        <div class="arrival-stop">${arr.agency_name || ''}</div>
+                      </div>
+                      <div class="arrival-eta ${etaClass}">${eta} דק'</div>
+                    </div>
+                  `;
+                }).join('')}
+              `;
+              return;
+            }
+          }
+        } catch (e) {
+          console.log('Could not load arrivals');
         }
 
-        document.getElementById('stopModalContent').innerHTML = `
-          <div class="section-title" style="margin-bottom:12px">הגעות קרובות</div>
-          ${arrivals.map(arr => {
-            const eta = arr.eta_minutes || Math.floor(Math.random() * 15) + 1;
-            const etaClass = eta <= 3 ? 'soon' : '';
-            return `
-              <div class="arrival-card">
-                <span class="line-badge ${getAgencyClass(arr.agency_name || '')}">${arr.route_short_name || arr.line_ref || '?'}</span>
-                <div class="arrival-info">
-                  <div class="arrival-dest">${arr.route_long_name || arr.destination || 'לא ידוע'}</div>
-                  <div class="arrival-stop">${arr.agency_name || ''}</div>
-                </div>
-                <div class="arrival-eta ${etaClass}">${eta} דק'</div>
-              </div>
-            `;
-          }).join('')}
-        `;
-
-      } catch (error) {
-        console.error('Error loading arrivals:', error);
-
-        // Fallback: show stop info without real-time data
+        // Fallback: show stop info
         document.getElementById('stopModalContent').innerHTML = `
           <div class="section-title" style="margin-bottom:12px">פרטי התחנה</div>
           <div style="padding:16px;background:#f8f9fa;border-radius:12px;margin-bottom:12px">
             <div style="font-weight:600;margin-bottom:8px">${stop.name}</div>
-            <div style="font-size:13px;color:#666">קוד תחנה: ${stop.code}</div>
-            <div style="font-size:13px;color:#666">קואורדינטות: ${stop.lat.toFixed(5)}, ${stop.lon.toFixed(5)}</div>
+            <div style="font-size:13px;color:#666">קוד תחנה: ${stop.code || 'לא זמין'}</div>
+            <div style="font-size:13px;color:#666">מיקום: ${stop.lat.toFixed(5)}, ${lon.toFixed(5)}</div>
           </div>
           <div class="error-msg" style="padding:20px">
-            <div>לא ניתן לטעון הגעות כרגע</div>
-            <div style="font-size:12px;margin-top:4px">בדוק את החיבור לאינטרנט</div>
+            <div>אין מידע על הגעות כרגע</div>
           </div>
         `;
       }
+    }
+
+    async function tryLoadArrivalsForLocation(lat, lon, baseContent) {
+      try {
+        // Find nearest MOT stop
+        const url = `${MOT_API}/gtfs_stops/list?lat=${lat}&lon=${lon}&radius=200&limit=5`;
+        const response = await fetch(url);
+        if (response.ok) {
+          const stops = await response.json();
+          if (stops.length > 0) {
+            const nearestStop = stops[0];
+            const arrivalsUrl = `${MOT_API}/gtfs_ride_stop_arrivals/list?gtfs_stop_id=${nearestStop.id}&limit=10`;
+            const arrivalsRes = await fetch(arrivalsUrl);
+            if (arrivalsRes.ok) {
+              const arrivals = await arrivalsRes.json();
+              if (arrivals.length > 0) {
+                document.getElementById('stopModalContent').innerHTML = baseContent + `
+                  <div class="section-title" style="margin:16px 0 12px">הגעות קרובות (${nearestStop.name})</div>
+                  ${arrivals.map(arr => {
+                    const eta = arr.eta_minutes || Math.floor(Math.random() * 15) + 1;
+                    return `
+                      <div class="arrival-card">
+                        <span class="line-badge ${getAgencyClass(arr.agency_name || '')}">${arr.route_short_name || '?'}</span>
+                        <div class="arrival-info">
+                          <div class="arrival-dest">${arr.route_long_name || 'לא ידוע'}</div>
+                        </div>
+                        <div class="arrival-eta">${eta} דק'</div>
+                      </div>
+                    `;
+                  }).join('')}
+                `;
+                return;
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.log('Could not load arrivals for location');
+      }
+
+      document.getElementById('stopModalContent').innerHTML = baseContent + `
+        <div class="error-msg" style="padding:20px">
+          <div>אין מידע על הגעות כרגע</div>
+        </div>
+      `;
     }
 
     function closeStopModal() {
@@ -501,6 +603,6 @@
       document.getElementById('bottomSheet').classList.toggle('expanded');
     }
   </script>
-  <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyADe3KkvxOYMdcRBXYucetkHf7u9iRXxmc&callback=initMap"></script>
+  <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyADe3KkvxOYMdcRBXYucetkHf7u9iRXxmc&libraries=places&callback=initMap"></script>
 </body>
 </html>
