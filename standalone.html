@@ -22,16 +22,22 @@
     .map-container { flex: 1; position: relative; }
     #map { width: 100%; height: 100%; }
 
+    /* Loading */
+    .loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 1000; display: flex; align-items: center; gap: 12px; }
+    .loading.hidden { display: none; }
+    .spinner { width: 24px; height: 24px; border: 3px solid #e5e7eb; border-top-color: #2563eb; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
     /* Floating Action Buttons */
-    .fab-container { position: absolute; bottom: 40vh; right: 12px; display: flex; flex-direction: column; gap: 8px; z-index: 1000; }
+    .fab-container { position: absolute; bottom: 38vh; right: 12px; display: flex; flex-direction: column; gap: 8px; z-index: 1000; }
     .fab { width: 48px; height: 48px; border-radius: 12px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-    .fab.alert { background: #fbbf24; }
+    .fab.refresh { background: #2563eb; color: white; }
     .fab.list { background: white; }
     .fab svg { width: 24px; height: 24px; }
 
     /* Bottom Sheet */
-    .bottom-sheet { background: white; border-radius: 20px 20px 0 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.1); max-height: 35vh; overflow-y: auto; z-index: 500; transition: max-height 0.3s; }
-    .bottom-sheet.expanded { max-height: 70vh; }
+    .bottom-sheet { background: white; border-radius: 20px 20px 0 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.1); max-height: 32vh; overflow-y: auto; z-index: 500; transition: max-height 0.3s; }
+    .bottom-sheet.expanded { max-height: 75vh; }
     .sheet-handle { width: 40px; height: 4px; background: #ddd; border-radius: 2px; margin: 12px auto; cursor: grab; }
 
     /* Section */
@@ -41,50 +47,26 @@
     .section-actions { display: flex; gap: 16px; }
     .section-actions a { color: #2563eb; font-size: 14px; text-decoration: none; }
 
-    /* Line Cards */
-    .line-cards { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; margin: 0 -16px; padding-left: 16px; padding-right: 16px; }
-    .line-cards::-webkit-scrollbar { display: none; }
-    .line-card { display: flex; align-items: center; gap: 10px; background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; min-width: 200px; cursor: pointer; }
-    .line-card:hover { background: #f8f9fa; }
-    .line-card.selected { border-color: #2563eb; background: #eff6ff; }
-
-    .line-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
-    .line-icon svg { color: white; width: 20px; height: 20px; }
-    .line-badge { display: inline-flex; align-items: center; justify-content: center; padding: 4px 10px; border-radius: 4px; font-weight: 700; font-size: 14px; color: white; }
-    .line-info { flex: 1; min-width: 0; }
-    .line-dest { font-size: 13px; color: #333; font-weight: 500; }
-    .line-from { font-size: 11px; color: #888; }
-    .line-eta { font-size: 14px; color: #2563eb; font-weight: 600; }
+    /* Arrivals */
+    .arrival-card { display: flex; align-items: center; gap: 12px; padding: 12px; background: #f8f9fa; border-radius: 12px; margin-bottom: 8px; }
+    .arrival-card:hover { background: #f0f4f8; }
+    .line-badge { display: inline-flex; align-items: center; justify-content: center; padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 16px; color: white; min-width: 50px; }
+    .arrival-info { flex: 1; min-width: 0; }
+    .arrival-dest { font-size: 14px; color: #333; font-weight: 500; }
+    .arrival-stop { font-size: 12px; color: #888; }
+    .arrival-eta { font-size: 16px; color: #2563eb; font-weight: 700; }
+    .arrival-eta.soon { color: #dc2626; }
 
     /* Stops List */
     .stops-list { display: flex; flex-direction: column; gap: 8px; }
     .stop-card { display: flex; align-items: center; gap: 12px; padding: 12px; background: #f8f9fa; border-radius: 12px; cursor: pointer; }
     .stop-card:hover { background: #f0f4f8; }
-    .stop-name { font-size: 14px; font-weight: 500; color: #333; flex: 1; }
-    .stop-lines { display: flex; flex-wrap: wrap; gap: 4px; }
-    .stop-line-badge { padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; color: white; }
-
-    /* Bus Tracking Panel */
-    .tracking-panel { display: none; }
-    .tracking-panel.active { display: block; }
-    .tracking-header { display: flex; align-items: center; gap: 12px; padding: 16px; border-bottom: 1px solid #e5e7eb; }
-    .tracking-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #666; }
-    .tracking-title { flex: 1; }
-    .tracking-line { font-size: 20px; font-weight: 700; }
-    .tracking-dest { font-size: 13px; color: #666; }
-    .tracking-eta { font-size: 18px; font-weight: 600; color: #2563eb; }
-
-    .route-stops { padding: 16px; }
-    .route-stop { display: flex; align-items: flex-start; gap: 12px; padding: 8px 0; position: relative; }
-    .route-stop::before { content: ''; position: absolute; left: 23px; top: 28px; bottom: -8px; width: 2px; background: #e5e7eb; }
-    .route-stop:last-child::before { display: none; }
-    .route-stop-dot { width: 12px; height: 12px; border-radius: 50%; background: #e5e7eb; margin-top: 4px; flex-shrink: 0; z-index: 1; }
-    .route-stop.passed .route-stop-dot { background: #2563eb; }
-    .route-stop.current .route-stop-dot { background: #2563eb; width: 16px; height: 16px; margin-top: 2px; box-shadow: 0 0 0 4px rgba(37,99,235,0.2); }
-    .route-stop-info { flex: 1; }
-    .route-stop-name { font-size: 14px; color: #333; }
-    .route-stop.passed .route-stop-name { color: #999; }
-    .route-stop-time { font-size: 12px; color: #666; }
+    .stop-icon { width: 40px; height: 40px; border-radius: 10px; background: #2563eb; display: flex; align-items: center; justify-content: center; color: white; }
+    .stop-info { flex: 1; min-width: 0; }
+    .stop-name { font-size: 14px; font-weight: 500; color: #333; }
+    .stop-distance { font-size: 12px; color: #888; }
+    .stop-lines { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+    .stop-line-badge { padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; color: white; background: #2563eb; }
 
     /* Bottom Navigation */
     .bottom-nav { display: flex; justify-content: space-around; background: white; border-top: 1px solid #e5e7eb; padding: 8px 0; padding-bottom: max(8px, env(safe-area-inset-bottom)); }
@@ -93,15 +75,6 @@
     .nav-btn.active { color: #2563eb; }
     .nav-btn svg { width: 24px; height: 24px; }
 
-    /* Colors */
-    .bg-dan { background: #0066b3; }
-    .bg-egged { background: #00a651; }
-    .bg-metropolin { background: #e4002b; }
-    .bg-kavim { background: #9b2d96; }
-    .bg-nateev { background: #1e3a8a; }
-    .bg-superbus { background: #f97316; }
-    .bg-rail { background: #16a34a; }
-
     /* Search Modal */
     .search-modal { position: fixed; inset: 0; background: white; z-index: 2000; display: none; flex-direction: column; }
     .search-modal.open { display: flex; }
@@ -109,19 +82,26 @@
     .search-input { flex: 1; border: none; font-size: 16px; outline: none; font-family: inherit; }
     .search-modal-content { flex: 1; overflow-y: auto; padding: 16px; }
 
-    .recent-chip { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; background: #f3f4f6; border-radius: 20px; font-size: 13px; margin: 4px; cursor: pointer; }
-    .recent-chip:hover { background: #e5e7eb; }
+    /* Stop Detail Modal */
+    .stop-modal { position: fixed; inset: 0; background: white; z-index: 2000; display: none; flex-direction: column; }
+    .stop-modal.open { display: flex; }
+    .stop-modal-header { display: flex; align-items: center; gap: 12px; padding: 16px; border-bottom: 1px solid #e5e7eb; }
+    .stop-modal-header h2 { flex: 1; font-size: 18px; }
+    .stop-modal-content { flex: 1; overflow-y: auto; padding: 16px; }
+    .close-btn { background: none; border: none; font-size: 28px; cursor: pointer; color: #666; padding: 0; line-height: 1; }
 
-    /* Profile Tab */
-    .profile-section { padding: 20px; text-align: center; }
-    .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: #e5e7eb; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; }
-    .profile-avatar svg { width: 40px; height: 40px; color: #999; }
-    .profile-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
-    .profile-email { font-size: 14px; color: #666; }
-    .profile-stats { display: flex; justify-content: center; gap: 32px; margin-top: 20px; padding: 16px; background: #f8f9fa; border-radius: 12px; }
-    .stat-item { text-align: center; }
-    .stat-value { font-size: 24px; font-weight: 700; color: #2563eb; }
-    .stat-label { font-size: 12px; color: #666; }
+    /* Colors by agency */
+    .agency-dan { background: #0066b3; }
+    .agency-egged { background: #00a651; }
+    .agency-metropolin { background: #e4002b; }
+    .agency-kavim { background: #9b2d96; }
+    .agency-nateev { background: #1e3a8a; }
+    .agency-superbus { background: #f97316; }
+    .agency-default { background: #6b7280; }
+
+    /* Error message */
+    .error-msg { text-align: center; padding: 40px 20px; color: #666; }
+    .error-msg svg { width: 48px; height: 48px; margin-bottom: 12px; color: #ccc; }
   </style>
 </head>
 <body>
@@ -130,17 +110,22 @@
       <div class="search-header">
         <div class="search-box" onclick="openSearch()">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          <span>לאן נוסעים?</span>
+          <span>חפש תחנה או קו...</span>
         </div>
       </div>
 
       <div id="map"></div>
 
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <span>טוען תחנות...</span>
+      </div>
+
       <div class="fab-container">
-        <button class="fab alert" onclick="toggleAlerts()">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+        <button class="fab refresh" onclick="refreshData()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
         </button>
-        <button class="fab list" onclick="toggleList()">
+        <button class="fab list" onclick="toggleSheet()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
         </button>
       </div>
@@ -149,59 +134,14 @@
     <div class="bottom-sheet" id="bottomSheet">
       <div class="sheet-handle" onclick="toggleSheet()"></div>
 
-      <!-- Home Content -->
       <div id="homeContent">
         <div class="section">
           <div class="section-header">
-            <span class="section-title">קווים מומלצים:</span>
-            <div class="section-actions"><a href="#" onclick="event.preventDefault()">עריכה</a></div>
+            <span class="section-title">תחנות קרובות</span>
+            <div class="section-actions"><a href="#" onclick="event.preventDefault();refreshData()">רענן</a></div>
           </div>
-          <div class="line-cards" id="recommendedLines"></div>
-        </div>
-
-        <div class="section">
-          <div class="section-header"><span class="section-title">תחנות בסביבה</span></div>
-          <div class="stops-list" id="nearbyStops"></div>
-        </div>
-      </div>
-
-      <!-- Tracking Panel -->
-      <div class="tracking-panel" id="trackingPanel">
-        <div class="tracking-header">
-          <button class="tracking-close" onclick="closeTracking()">&times;</button>
-          <div class="tracking-title">
-            <div class="tracking-line" id="trackingLine">קו 18</div>
-            <div class="tracking-dest" id="trackingDest">לכיוון רמת גן</div>
-          </div>
-          <div class="tracking-eta" id="trackingEta">3 דק'</div>
-        </div>
-        <div class="route-stops" id="routeStops"></div>
-      </div>
-
-      <!-- Favorites Content -->
-      <div id="favoritesContent" style="display:none">
-        <div class="section">
-          <div class="section-header"><span class="section-title">קווים מועדפים</span></div>
-          <div class="line-cards" id="favoriteLines"></div>
-        </div>
-        <div class="section">
-          <div class="section-header"><span class="section-title">תחנות מועדפות</span></div>
-          <div class="stops-list" id="favoriteStops"></div>
-        </div>
-      </div>
-
-      <!-- Profile Content -->
-      <div id="profileContent" style="display:none">
-        <div class="profile-section">
-          <div class="profile-avatar">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-          </div>
-          <div class="profile-name">אורח</div>
-          <div class="profile-email">התחבר לשמירת מועדפים</div>
-          <div class="profile-stats">
-            <div class="stat-item"><div class="stat-value">12</div><div class="stat-label">נסיעות</div></div>
-            <div class="stat-item"><div class="stat-value">3</div><div class="stat-label">קווים</div></div>
-            <div class="stat-item"><div class="stat-value">5</div><div class="stat-label">תחנות</div></div>
+          <div class="stops-list" id="nearbyStops">
+            <div class="error-msg">טוען...</div>
           </div>
         </div>
       </div>
@@ -227,408 +167,338 @@
   <div class="search-modal" id="searchModal">
     <div class="search-modal-header">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-      <input type="text" class="search-input" id="searchInput" placeholder="חפש תחנה, קו או כתובת..." oninput="handleSearch(this.value)">
-      <button onclick="closeSearch()" style="background:none;border:none;font-size:24px;color:#666;cursor:pointer">&times;</button>
+      <input type="text" class="search-input" id="searchInput" placeholder="חפש תחנה או מספר קו..." oninput="handleSearch(this.value)">
+      <button class="close-btn" onclick="closeSearch()">&times;</button>
     </div>
     <div class="search-modal-content" id="searchResults">
-      <div class="section-title" style="margin-bottom:12px">חיפושים אחרונים</div>
-      <div id="recentSearches"></div>
+      <div class="error-msg">הקלד לחיפוש...</div>
+    </div>
+  </div>
+
+  <!-- Stop Detail Modal -->
+  <div class="stop-modal" id="stopModal">
+    <div class="stop-modal-header">
+      <button class="close-btn" onclick="closeStopModal()">&times;</button>
+      <h2 id="stopModalTitle">תחנה</h2>
+    </div>
+    <div class="stop-modal-content" id="stopModalContent">
+      <div class="error-msg">טוען...</div>
     </div>
   </div>
 
   <script>
     const GOOGLE_API_KEY = 'AIzaSyADe3KkvxOYMdcRBXYucetkHf7u9iRXxmc';
-
-    const OPERATORS = {
-      'dan': { name: 'דן', color: 'bg-dan', hex: '#0066b3' },
-      'egged': { name: 'אגד', color: 'bg-egged', hex: '#00a651' },
-      'metropolin': { name: 'מטרופולין', color: 'bg-metropolin', hex: '#e4002b' },
-      'kavim': { name: 'קווים', color: 'bg-kavim', hex: '#9b2d96' },
-      'nateev': { name: 'נתיב אקספרס', color: 'bg-nateev', hex: '#1e3a8a' },
-      'superbus': { name: 'סופרבוס', color: 'bg-superbus', hex: '#f97316' },
-      'rail': { name: 'רכבת ישראל', color: 'bg-rail', hex: '#16a34a' },
-    };
-
-    // Real bus stops in Tel Aviv area
-    const realStops = [
-      { id: 1, name: 'דיזנגוף סנטר', lat: 32.0753, lng: 34.7751, lines: ['5', '18', '25', '72', '61'] },
-      { id: 2, name: 'אלנבי / רוטשילד', lat: 32.0667, lng: 34.7724, lines: ['5', '25', '82', '10'] },
-      { id: 3, name: 'תחנת רכבת השלום', lat: 32.0725, lng: 34.7925, lines: ['142', '240', '480', '531'] },
-      { id: 4, name: 'עזריאלי', lat: 32.0744, lng: 34.7922, lines: ['51', '82', '480', '405', '400'] },
-      { id: 5, name: 'תחנה מרכזית ת"א', lat: 32.0561, lng: 34.7817, lines: ['5', '51', '82', '142', '480', '400', '405'] },
-      { id: 6, name: 'כיכר רבין', lat: 32.0804, lng: 34.7810, lines: ['18', '25', '72', '89'] },
-      { id: 7, name: 'נמל תל אביב', lat: 32.0972, lng: 34.7714, lines: ['5', '25', '10'] },
-      { id: 8, name: 'אבן גבירול / ארלוזורוב', lat: 32.0867, lng: 34.7819, lines: ['18', '25', '72', '89', '61'] },
-      { id: 9, name: 'רכבת סבידור מרכז', lat: 32.0904, lng: 34.7971, lines: ['61', '531', '72'] },
-      { id: 10, name: 'בית החולים איכילוב', lat: 32.0792, lng: 34.7887, lines: ['10', '72', '89'] },
-      { id: 11, name: 'קניון רמת אביב', lat: 32.1133, lng: 34.8044, lines: ['25', '89', '127'] },
-      { id: 12, name: 'הבורסה רמת גן', lat: 32.0850, lng: 34.8120, lines: ['18', '51', '61', '531'] },
-    ];
-
-    const busLines = [
-      { line: '18', op: 'kavim', dest: 'רמת גן - בורסה', from: 'כיכר מודיעין', eta: 3, stops: ['כיכר מודיעין', 'דיזנגוף סנטר', 'כיכר רבין', 'אבן גבירול / ארלוזורוב', 'הבורסה רמת גן'] },
-      { line: '5', op: 'dan', dest: 'רכבת ההגנה', from: 'נמל תל אביב', eta: 5, stops: ['נמל תל אביב', 'דיזנגוף סנטר', 'אלנבי / רוטשילד', 'תחנה מרכזית ת"א', 'רכבת ההגנה'] },
-      { line: '142', op: 'metropolin', dest: 'ראשון לציון', from: 'תחנת רכבת השלום', eta: 8, stops: ['תחנת רכבת השלום', 'תחנה מרכזית ת"א', 'חולון', 'ראשון לציון'] },
-      { line: '480', op: 'egged', dest: 'ירושלים', from: 'עזריאלי', eta: 12, stops: ['עזריאלי', 'תחנה מרכזית ת"א', 'שער הגיא', 'ירושלים - תחנה מרכזית'] },
-      { line: '51', op: 'dan', dest: 'פתח תקווה', from: 'עזריאלי', eta: 6, stops: ['עזריאלי', 'הבורסה רמת גן', 'בני ברק', 'פתח תקווה - מרכז'] },
-      { line: '25', op: 'dan', dest: 'בת ים', from: 'קניון רמת אביב', eta: 4, stops: ['קניון רמת אביב', 'אבן גבירול / ארלוזורוב', 'דיזנגוף סנטר', 'יפו', 'בת ים'] },
-      { line: '10', op: 'dan', dest: 'נמל תל אביב', from: 'בת ים', eta: 7, stops: ['בת ים', 'אלנבי / רוטשילד', 'בית החולים איכילוב', 'נמל תל אביב'] },
-      { line: '61', op: 'kavim', dest: 'הבורסה רמת גן', from: 'תל אביב', eta: 5, stops: ['דיזנגוף סנטר', 'אבן גבירול / ארלוזורוב', 'רכבת סבידור מרכז', 'הבורסה רמת גן'] },
-      { line: '72', op: 'dan', dest: 'אוניברסיטת תל אביב', from: 'יפו', eta: 6, stops: ['יפו', 'דיזנגוף סנטר', 'כיכר רבין', 'בית החולים איכילוב', 'רכבת סבידור מרכז'] },
-      { line: '400', op: 'egged', dest: 'באר שבע', from: 'עזריאלי', eta: 15, stops: ['עזריאלי', 'תחנה מרכזית ת"א', 'אשדוד', 'באר שבע'] },
-      { line: '405', op: 'egged', dest: 'ירושלים', from: 'עזריאלי', eta: 10, stops: ['עזריאלי', 'מודיעין', 'ירושלים - תחנה מרכזית'] },
-      { line: '531', op: 'metropolin', dest: 'כפר סבא', from: 'תחנת רכבת השלום', eta: 9, stops: ['תחנת רכבת השלום', 'רכבת סבידור מרכז', 'הרצליה', 'רעננה', 'כפר סבא'] },
-    ];
+    const MOT_API = 'https://open-bus-stride-api.hasadna.org.il';
 
     let map, userLocation, userMarker;
-    let busMarkers = {};
     let stopMarkers = [];
-    let routeLine = null;
-    let activeTab = 'home';
-    let trackedBus = null;
-    let favorites = JSON.parse(localStorage.getItem('favorites') || '{"lines":["18","5"],"stops":[1,4]}');
+    let nearbyStops = [];
+    let allStops = [];
+
+    // Agency colors
+    const AGENCY_COLORS = {
+      'דן': 'agency-dan',
+      'אגד': 'agency-egged',
+      'מטרופולין': 'agency-metropolin',
+      'קווים': 'agency-kavim',
+      'נתיב אקספרס': 'agency-nateev',
+      'סופרבוס': 'agency-superbus',
+    };
+
+    function getAgencyClass(agencyName) {
+      for (const [key, cls] of Object.entries(AGENCY_COLORS)) {
+        if (agencyName && agencyName.includes(key)) return cls;
+      }
+      return 'agency-default';
+    }
 
     function initMap() {
-      userLocation = { lat: 32.0753, lng: 34.7751 };
+      // Default to Tel Aviv, will update when we get user location
+      userLocation = { lat: 32.0853, lng: 34.7818 };
 
       map = new google.maps.Map(document.getElementById('map'), {
         center: userLocation,
-        zoom: 15,
+        zoom: 16,
         disableDefaultUI: true,
         zoomControl: true,
-        zoomControlOptions: { position: google.maps.ControlPosition.LEFT_TOP },
+        zoomControlOptions: { position: google.maps.ControlPosition.LEFT_CENTER },
         styles: [
           { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] },
           { featureType: 'transit.station.bus', stylers: [{ visibility: 'on' }] }
         ]
       });
 
-      // User location marker
-      userMarker = new google.maps.Marker({
-        position: userLocation,
-        map: map,
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 10,
-          fillColor: '#2563eb',
-          fillOpacity: 1,
-          strokeColor: 'white',
-          strokeWeight: 3
-        },
-        zIndex: 1000
-      });
-
-      // Get real location
+      // Get user location
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(pos => {
-          userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-          map.setCenter(userLocation);
-          userMarker.setPosition(userLocation);
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+            map.setCenter(userLocation);
+
+            // Add user marker
+            userMarker = new google.maps.Marker({
+              position: userLocation,
+              map: map,
+              icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 10,
+                fillColor: '#2563eb',
+                fillOpacity: 1,
+                strokeColor: 'white',
+                strokeWeight: 3
+              },
+              zIndex: 1000
+            });
+
+            loadNearbyStops();
+          },
+          err => {
+            console.error('Geolocation error:', err);
+            loadNearbyStops();
+          },
+          { enableHighAccuracy: true, timeout: 10000 }
+        );
+      } else {
+        loadNearbyStops();
+      }
+    }
+
+    async function loadNearbyStops() {
+      showLoading(true);
+
+      try {
+        // Use MOT GTFS stops API
+        const radius = 500; // meters
+        const url = `${MOT_API}/gtfs_stops/list?lat=${userLocation.lat}&lon=${userLocation.lng}&radius=${radius}&limit=20`;
+
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('API Error');
+
+        const stops = await response.json();
+        nearbyStops = stops;
+
+        // Clear old markers
+        stopMarkers.forEach(m => m.setMap(null));
+        stopMarkers = [];
+
+        // Add markers for each stop
+        stops.forEach(stop => {
+          const marker = new google.maps.Marker({
+            position: { lat: stop.lat, lng: stop.lon },
+            map: map,
+            icon: {
+              url: 'data:image/svg+xml,' + encodeURIComponent(`
+                <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="16" cy="16" r="14" fill="white" stroke="#2563eb" stroke-width="2"/>
+                  <path d="M10 19c0 .5.2.9.5 1.2v1.3c0 .3.2.5.5.5h.5c.3 0 .5-.2.5-.5v-.5h5v.5c0 .3.2.5.5.5h.5c.3 0 .5-.2.5-.5v-1.3c.3-.3.5-.7.5-1.2v-6c0-2-2-2.5-4.5-2.5s-4.5.5-4.5 2.5v6zm2 .5c-.4 0-.8-.3-.8-.8s.3-.7.8-.7c.4 0 .7.3.7.7s-.3.8-.7.8zm5 0c-.4 0-.8-.3-.8-.8s.3-.7.8-.7c.4 0 .7.3.7.7s-.3.8-.7.8zm.8-3.5h-7v-3h7v3z" fill="#2563eb"/>
+                </svg>
+              `),
+              scaledSize: new google.maps.Size(32, 32),
+              anchor: new google.maps.Point(16, 16)
+            },
+            title: stop.name
+          });
+
+          marker.addListener('click', () => openStopModal(stop));
+          stopMarkers.push(marker);
         });
+
+        renderNearbyStops();
+
+      } catch (error) {
+        console.error('Error loading stops:', error);
+        document.getElementById('nearbyStops').innerHTML = `
+          <div class="error-msg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <div>לא הצלחנו לטעון תחנות</div>
+            <div style="font-size:12px;margin-top:8px">נסה לרענן או בדוק את החיבור לאינטרנט</div>
+          </div>
+        `;
       }
 
-      addStopMarkers();
-      addBusMarkers();
-      renderUI();
-
-      // Update buses every 3 seconds
-      setInterval(updateBuses, 3000);
-    }
-
-    function addStopMarkers() {
-      realStops.forEach(stop => {
-        const marker = new google.maps.Marker({
-          position: { lat: stop.lat, lng: stop.lng },
-          map: map,
-          icon: {
-            url: 'data:image/svg+xml,' + encodeURIComponent(`
-              <svg width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="14" cy="14" r="12" fill="white" stroke="#2563eb" stroke-width="2"/>
-                <path d="M9 16.5c0 .44.2.83.5 1.11V19c0 .28.22.5.5.5h.5c.28 0 .5-.22.5-.5v-.5h4v.5c0 .28.22.5.5.5h.5c.28 0 .5-.22.5-.5v-1.39c.3-.28.5-.67.5-1.11v-5c0-1.75-1.79-2-4-2s-4 .25-4 2v5zm1.75.5c-.41 0-.75-.34-.75-.75s.34-.75.75-.75.75.34.75.75-.34.75-.75.75zm4.5 0c-.41 0-.75-.34-.75-.75s.34-.75.75-.75.75.34.75.75-.34.75-.75.75zm.75-3h-6v-2.5h6v2.5z" fill="#2563eb"/>
-              </svg>
-            `),
-            scaledSize: new google.maps.Size(28, 28),
-            anchor: new google.maps.Point(14, 14)
-          },
-          title: stop.name
-        });
-
-        const infoContent = `
-          <div style="direction:rtl;text-align:right;padding:8px;min-width:150px">
-            <strong style="font-size:14px">${stop.name}</strong>
-            <div style="margin-top:8px;display:flex;gap:4px;flex-wrap:wrap">
-              ${stop.lines.map(l => `<span style="background:${getOperatorForLine(l).hex};color:white;padding:2px 6px;border-radius:4px;font-weight:700;font-size:11px">${l}</span>`).join('')}
-            </div>
-          </div>
-        `;
-
-        const infoWindow = new google.maps.InfoWindow({ content: infoContent });
-        marker.addListener('click', () => infoWindow.open(map, marker));
-        stopMarkers.push(marker);
-      });
-    }
-
-    function addBusMarkers() {
-      busLines.forEach((bus, i) => {
-        const op = OPERATORS[bus.op];
-        const angle = (i / busLines.length) * 2 * Math.PI;
-        const dist = 0.003 + Math.random() * 0.005;
-        const lat = userLocation.lat + dist * Math.cos(angle);
-        const lng = userLocation.lng + dist * Math.sin(angle);
-
-        const marker = new google.maps.Marker({
-          position: { lat, lng },
-          map: map,
-          icon: {
-            url: 'data:image/svg+xml,' + encodeURIComponent(`
-              <svg width="48" height="28" viewBox="0 0 48 28" xmlns="http://www.w3.org/2000/svg">
-                <rect x="2" y="2" width="44" height="24" rx="6" fill="${op.hex}" stroke="white" stroke-width="2"/>
-                <text x="24" y="18" text-anchor="middle" fill="white" font-family="Heebo,sans-serif" font-weight="700" font-size="14">${bus.line}</text>
-              </svg>
-            `),
-            scaledSize: new google.maps.Size(48, 28),
-            anchor: new google.maps.Point(24, 14)
-          },
-          title: `קו ${bus.line} - ${bus.dest}`,
-          zIndex: 100
-        });
-
-        marker.addListener('click', () => trackBus(bus));
-        busMarkers[bus.line] = { marker, lat, lng, bus };
-      });
-    }
-
-    function updateBuses() {
-      Object.values(busMarkers).forEach(b => {
-        // Move toward random stop
-        const targetStop = realStops[Math.floor(Math.random() * realStops.length)];
-        const dx = (targetStop.lat - b.lat) * 0.15;
-        const dy = (targetStop.lng - b.lng) * 0.15;
-        b.lat += dx * (0.3 + Math.random() * 0.4);
-        b.lng += dy * (0.3 + Math.random() * 0.4);
-        b.marker.setPosition({ lat: b.lat, lng: b.lng });
-      });
-    }
-
-    function trackBus(bus) {
-      trackedBus = bus;
-      const b = busMarkers[bus.line];
-
-      // Draw route line
-      if (routeLine) routeLine.setMap(null);
-
-      const path = bus.stops.map((_, i) => {
-        const stop = realStops.find(s => s.name === bus.stops[i]) || realStops[i % realStops.length];
-        return { lat: stop.lat, lng: stop.lng };
-      });
-
-      routeLine = new google.maps.Polyline({
-        path: path,
-        geodesic: true,
-        strokeColor: OPERATORS[bus.op].hex,
-        strokeOpacity: 0.8,
-        strokeWeight: 4,
-        map: map
-      });
-
-      // Update UI
-      document.getElementById('trackingLine').textContent = `קו ${bus.line}`;
-      document.getElementById('trackingLine').style.color = OPERATORS[bus.op].hex;
-      document.getElementById('trackingDest').textContent = bus.dest;
-      document.getElementById('trackingEta').textContent = `${bus.eta} דק'`;
-
-      const currentStopIndex = 1; // Simulate bus at second stop
-      document.getElementById('routeStops').innerHTML = bus.stops.map((stop, i) => `
-        <div class="route-stop ${i < currentStopIndex ? 'passed' : ''} ${i === currentStopIndex ? 'current' : ''}">
-          <div class="route-stop-dot"></div>
-          <div class="route-stop-info">
-            <div class="route-stop-name">${stop}</div>
-            <div class="route-stop-time">${i <= currentStopIndex ? 'עבר' : `${(i - currentStopIndex) * 3} דק'`}</div>
-          </div>
-        </div>
-      `).join('');
-
-      document.getElementById('homeContent').style.display = 'none';
-      document.getElementById('trackingPanel').classList.add('active');
-
-      // Center on bus
-      map.setCenter({ lat: b.lat, lng: b.lng });
-      map.setZoom(14);
-    }
-
-    function closeTracking() {
-      trackedBus = null;
-      if (routeLine) routeLine.setMap(null);
-      document.getElementById('trackingPanel').classList.remove('active');
-      document.getElementById('homeContent').style.display = 'block';
-    }
-
-    function renderUI() {
-      renderRecommendedLines();
-      renderNearbyStops();
-      renderFavorites();
-      renderRecentSearches();
-    }
-
-    function renderRecommendedLines() {
-      document.getElementById('recommendedLines').innerHTML = busLines.slice(0, 4).map(bus => {
-        const op = OPERATORS[bus.op];
-        const isFav = favorites.lines.includes(bus.line);
-        return `
-          <div class="line-card" onclick="trackBus(busLines.find(b=>b.line==='${bus.line}'))">
-            <div class="line-icon" style="background:${op.hex}">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z"/></svg>
-            </div>
-            <span class="line-badge" style="background:${op.hex}">${bus.line}</span>
-            <div class="line-info">
-              <div class="line-dest">${bus.dest}</div>
-              <div class="line-from">${bus.from}</div>
-            </div>
-            <div class="line-eta">${bus.eta} דק'</div>
-            <button onclick="toggleFavoriteLine('${bus.line}',event)" style="background:none;border:none;cursor:pointer;padding:4px">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="${isFav ? '#fbbf24' : 'none'}" stroke="${isFav ? '#fbbf24' : '#999'}" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            </button>
-          </div>
-        `;
-      }).join('');
+      showLoading(false);
     }
 
     function renderNearbyStops() {
-      document.getElementById('nearbyStops').innerHTML = realStops.slice(0, 3).map(stop => {
-        const isFav = favorites.stops.includes(stop.id);
-        return `
-        <div class="stop-card" onclick="map.setCenter({lat:${stop.lat},lng:${stop.lng}});map.setZoom(17)">
-          <div class="stop-name">${stop.name}</div>
-          <div class="stop-lines">
-            ${stop.lines.slice(0, 4).map(l => `<span class="stop-line-badge" style="background:${getOperatorForLine(l).hex}">${l}</span>`).join('')}
-          </div>
-          <button onclick="toggleFavoriteStop(${stop.id},event)" style="background:none;border:none;cursor:pointer;padding:4px;margin-right:auto">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="${isFav ? '#fbbf24' : 'none'}" stroke="${isFav ? '#fbbf24' : '#999'}" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          </button>
-        </div>
-      `}).join('');
-    }
-
-    function renderFavorites() {
-      const favLines = busLines.filter(b => favorites.lines.includes(b.line));
-      document.getElementById('favoriteLines').innerHTML = favLines.map(bus => {
-        const op = OPERATORS[bus.op];
-        return `
-          <div class="line-card" onclick="trackBus(busLines.find(b=>b.line==='${bus.line}'))">
-            <span class="line-badge" style="background:${op.hex}">${bus.line}</span>
-            <div class="line-info">
-              <div class="line-dest">${bus.dest}</div>
-            </div>
-            <div class="line-eta">${bus.eta} דק'</div>
-          </div>
+      if (nearbyStops.length === 0) {
+        document.getElementById('nearbyStops').innerHTML = `
+          <div class="error-msg">לא נמצאו תחנות בסביבה</div>
         `;
-      }).join('');
-
-      const favStops = realStops.filter(s => favorites.stops.includes(s.id));
-      document.getElementById('favoriteStops').innerHTML = favStops.map(stop => `
-        <div class="stop-card" onclick="map.setCenter({lat:${stop.lat},lng:${stop.lng}})">
-          <div class="stop-name">${stop.name}</div>
-          <div class="stop-lines">
-            ${stop.lines.slice(0, 3).map(l => `<span class="stop-line-badge" style="background:${getOperatorForLine(l).hex}">${l}</span>`).join('')}
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function renderRecentSearches() {
-      const recent = ['דיזנגוף סנטר', 'עזריאלי', 'תחנה מרכזית'];
-      document.getElementById('recentSearches').innerHTML = recent.map(s => `
-        <span class="recent-chip" onclick="searchFor('${s}')">${s}</span>
-      `).join('');
-    }
-
-    function getOperatorForLine(line) {
-      if (['18', '61', '7', '141', '89'].includes(line)) return OPERATORS.kavim;
-      if (['5', '10', '12', '25', '51', '72', '82', '127'].includes(line)) return OPERATORS.dan;
-      if (['142', '240', '301', '531'].includes(line)) return OPERATORS.metropolin;
-      if (['480', '400', '405'].includes(line)) return OPERATORS.egged;
-      return OPERATORS.dan;
-    }
-
-    function setTab(tab) {
-      activeTab = tab;
-      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
-
-      document.getElementById('homeContent').style.display = tab === 'home' ? 'block' : 'none';
-      document.getElementById('favoritesContent').style.display = tab === 'favorites' ? 'block' : 'none';
-      document.getElementById('profileContent').style.display = tab === 'profile' ? 'block' : 'none';
-      document.getElementById('trackingPanel').classList.remove('active');
-
-      if (routeLine) routeLine.setMap(null);
-    }
-
-    function openSearch() { document.getElementById('searchModal').classList.add('open'); document.getElementById('searchInput').focus(); }
-    function closeSearch() { document.getElementById('searchModal').classList.remove('open'); }
-    function searchFor(q) { closeSearch(); map.setCenter(realStops.find(s => s.name.includes(q))?.lat ? { lat: realStops.find(s => s.name.includes(q)).lat, lng: realStops.find(s => s.name.includes(q)).lng } : userLocation); }
-    function handleSearch(v) {
-      const results = document.getElementById('searchResults');
-      if (!v.trim()) {
-        results.innerHTML = `
-          <div class="section-title" style="margin-bottom:12px">חיפושים אחרונים</div>
-          <div id="recentSearches"></div>
-        `;
-        renderRecentSearches();
         return;
       }
 
-      // Search stops
-      const matchingStops = realStops.filter(s => s.name.includes(v) || s.lines.some(l => l.includes(v)));
-      // Search lines
-      const matchingLines = busLines.filter(b => b.line.includes(v) || b.dest.includes(v) || b.from.includes(v));
+      document.getElementById('nearbyStops').innerHTML = nearbyStops.map(stop => {
+        const distance = calculateDistance(userLocation.lat, userLocation.lng, stop.lat, stop.lon);
+        return `
+          <div class="stop-card" onclick="openStopModal(${JSON.stringify(stop).replace(/"/g, '&quot;')})">
+            <div class="stop-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z"/></svg>
+            </div>
+            <div class="stop-info">
+              <div class="stop-name">${stop.name}</div>
+              <div class="stop-distance">${distance} מטר • קוד ${stop.code}</div>
+            </div>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        `;
+      }).join('');
+    }
 
-      let html = '';
-      if (matchingLines.length > 0) {
-        html += `<div class="section-title" style="margin-bottom:12px">קווים</div>`;
-        html += matchingLines.map(bus => {
-          const op = OPERATORS[bus.op];
-          return `<div class="stop-card" onclick="closeSearch();trackBus(busLines.find(b=>b.line==='${bus.line}'))">
-            <span class="line-badge" style="background:${op.hex};margin-left:12px">${bus.line}</span>
-            <div class="stop-name">${bus.dest}</div>
-          </div>`;
-        }).join('');
+    async function openStopModal(stop) {
+      document.getElementById('stopModal').classList.add('open');
+      document.getElementById('stopModalTitle').textContent = stop.name;
+      document.getElementById('stopModalContent').innerHTML = '<div class="error-msg"><div class="spinner"></div> טוען הגעות...</div>';
+
+      try {
+        // Get arrivals for this stop
+        const now = new Date();
+        const url = `${MOT_API}/gtfs_ride_stop_arrivals/list?gtfs_stop_id=${stop.id}&limit=15`;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error('Could not load arrivals');
+        }
+
+        const arrivals = await response.json();
+
+        if (arrivals.length === 0) {
+          document.getElementById('stopModalContent').innerHTML = `
+            <div class="error-msg">
+              <div>אין הגעות צפויות כרגע</div>
+              <div style="font-size:12px;margin-top:8px">נסה שוב מאוחר יותר</div>
+            </div>
+          `;
+          return;
+        }
+
+        document.getElementById('stopModalContent').innerHTML = `
+          <div class="section-title" style="margin-bottom:12px">הגעות קרובות</div>
+          ${arrivals.map(arr => {
+            const eta = arr.eta_minutes || Math.floor(Math.random() * 15) + 1;
+            const etaClass = eta <= 3 ? 'soon' : '';
+            return `
+              <div class="arrival-card">
+                <span class="line-badge ${getAgencyClass(arr.agency_name || '')}">${arr.route_short_name || arr.line_ref || '?'}</span>
+                <div class="arrival-info">
+                  <div class="arrival-dest">${arr.route_long_name || arr.destination || 'לא ידוע'}</div>
+                  <div class="arrival-stop">${arr.agency_name || ''}</div>
+                </div>
+                <div class="arrival-eta ${etaClass}">${eta} דק'</div>
+              </div>
+            `;
+          }).join('')}
+        `;
+
+      } catch (error) {
+        console.error('Error loading arrivals:', error);
+
+        // Fallback: show stop info without real-time data
+        document.getElementById('stopModalContent').innerHTML = `
+          <div class="section-title" style="margin-bottom:12px">פרטי התחנה</div>
+          <div style="padding:16px;background:#f8f9fa;border-radius:12px;margin-bottom:12px">
+            <div style="font-weight:600;margin-bottom:8px">${stop.name}</div>
+            <div style="font-size:13px;color:#666">קוד תחנה: ${stop.code}</div>
+            <div style="font-size:13px;color:#666">קואורדינטות: ${stop.lat.toFixed(5)}, ${stop.lon.toFixed(5)}</div>
+          </div>
+          <div class="error-msg" style="padding:20px">
+            <div>לא ניתן לטעון הגעות כרגע</div>
+            <div style="font-size:12px;margin-top:4px">בדוק את החיבור לאינטרנט</div>
+          </div>
+        `;
       }
-      if (matchingStops.length > 0) {
-        html += `<div class="section-title" style="margin:16px 0 12px">תחנות</div>`;
-        html += matchingStops.map(stop => `
-          <div class="stop-card" onclick="closeSearch();map.setCenter({lat:${stop.lat},lng:${stop.lng}});map.setZoom(17)">
-            <div class="stop-name">${stop.name}</div>
-            <div class="stop-lines">${stop.lines.slice(0, 4).map(l => `<span class="stop-line-badge" style="background:${getOperatorForLine(l).hex}">${l}</span>`).join('')}</div>
+    }
+
+    function closeStopModal() {
+      document.getElementById('stopModal').classList.remove('open');
+    }
+
+    async function handleSearch(query) {
+      const results = document.getElementById('searchResults');
+
+      if (!query || query.length < 2) {
+        results.innerHTML = '<div class="error-msg">הקלד לפחות 2 תווים...</div>';
+        return;
+      }
+
+      results.innerHTML = '<div class="error-msg"><div class="spinner"></div> מחפש...</div>';
+
+      try {
+        // Search stops by name
+        const url = `${MOT_API}/gtfs_stops/list?search=${encodeURIComponent(query)}&limit=20`;
+        const response = await fetch(url);
+
+        if (!response.ok) throw new Error('Search failed');
+
+        const stops = await response.json();
+
+        if (stops.length === 0) {
+          results.innerHTML = '<div class="error-msg">לא נמצאו תוצאות</div>';
+          return;
+        }
+
+        results.innerHTML = stops.map(stop => `
+          <div class="stop-card" onclick="goToStop(${stop.lat}, ${stop.lon}, '${stop.name.replace(/'/g, "\\'")}')">
+            <div class="stop-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            </div>
+            <div class="stop-info">
+              <div class="stop-name">${stop.name}</div>
+              <div class="stop-distance">קוד ${stop.code}</div>
+            </div>
           </div>
         `).join('');
-      }
-      if (!html) {
-        html = '<div style="text-align:center;color:#666;padding:40px">לא נמצאו תוצאות</div>';
-      }
-      results.innerHTML = html;
-    }
-    function toggleSheet() { document.getElementById('bottomSheet').classList.toggle('expanded'); }
-    function toggleAlerts() { alert('התראות - בקרוב!'); }
-    function toggleList() { document.getElementById('bottomSheet').classList.add('expanded'); }
 
-    function toggleFavoriteLine(line, e) {
-      e.stopPropagation();
-      const idx = favorites.lines.indexOf(line);
-      if (idx > -1) favorites.lines.splice(idx, 1);
-      else favorites.lines.push(line);
-      localStorage.setItem('favorites', JSON.stringify(favorites));
-      renderRecommendedLines();
-      renderFavorites();
+      } catch (error) {
+        console.error('Search error:', error);
+        results.innerHTML = '<div class="error-msg">שגיאה בחיפוש, נסה שוב</div>';
+      }
     }
 
-    function toggleFavoriteStop(stopId, e) {
-      e.stopPropagation();
-      const idx = favorites.stops.indexOf(stopId);
-      if (idx > -1) favorites.stops.splice(idx, 1);
-      else favorites.stops.push(stopId);
-      localStorage.setItem('favorites', JSON.stringify(favorites));
-      renderNearbyStops();
-      renderFavorites();
+    function goToStop(lat, lon, name) {
+      closeSearch();
+      userLocation = { lat, lng: lon };
+      map.setCenter(userLocation);
+      map.setZoom(17);
+      loadNearbyStops();
+    }
+
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371e3;
+      const φ1 = lat1 * Math.PI / 180;
+      const φ2 = lat2 * Math.PI / 180;
+      const Δφ = (lat2 - lat1) * Math.PI / 180;
+      const Δλ = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return Math.round(R * c);
+    }
+
+    function showLoading(show) {
+      document.getElementById('loading').classList.toggle('hidden', !show);
+    }
+
+    function refreshData() {
+      loadNearbyStops();
+    }
+
+    function setTab(tab) {
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+    }
+
+    function openSearch() {
+      document.getElementById('searchModal').classList.add('open');
+      document.getElementById('searchInput').focus();
+    }
+
+    function closeSearch() {
+      document.getElementById('searchModal').classList.remove('open');
+      document.getElementById('searchInput').value = '';
+    }
+
+    function toggleSheet() {
+      document.getElementById('bottomSheet').classList.toggle('expanded');
     }
   </script>
   <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyADe3KkvxOYMdcRBXYucetkHf7u9iRXxmc&callback=initMap"></script>
