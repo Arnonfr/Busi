@@ -23,15 +23,15 @@
     #map { width: 100%; height: 100%; }
 
     /* Floating Action Buttons */
-    .fab-container { position: absolute; bottom: 180px; right: 12px; display: flex; flex-direction: column; gap: 8px; z-index: 1000; }
+    .fab-container { position: absolute; bottom: 40vh; right: 12px; display: flex; flex-direction: column; gap: 8px; z-index: 1000; }
     .fab { width: 48px; height: 48px; border-radius: 12px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
     .fab.alert { background: #fbbf24; }
     .fab.list { background: white; }
     .fab svg { width: 24px; height: 24px; }
 
     /* Bottom Sheet */
-    .bottom-sheet { background: white; border-radius: 20px 20px 0 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.1); max-height: 50vh; overflow-y: auto; z-index: 500; transition: max-height 0.3s; }
-    .bottom-sheet.expanded { max-height: 80vh; }
+    .bottom-sheet { background: white; border-radius: 20px 20px 0 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.1); max-height: 35vh; overflow-y: auto; z-index: 500; transition: max-height 0.3s; }
+    .bottom-sheet.expanded { max-height: 70vh; }
     .sheet-handle { width: 40px; height: 4px; background: #ddd; border-radius: 2px; margin: 12px auto; cursor: grab; }
 
     /* Section */
@@ -251,23 +251,33 @@
 
     // Real bus stops in Tel Aviv area
     const realStops = [
-      { id: 1, name: 'דיזנגוף סנטר', lat: 32.0753, lng: 34.7751, lines: ['5', '18', '25', '72'] },
-      { id: 2, name: 'אלנבי / רוטשילד', lat: 32.0667, lng: 34.7724, lines: ['5', '25', '82'] },
-      { id: 3, name: 'תחנת רכבת השלום', lat: 32.0725, lng: 34.7925, lines: ['142', '240', '480'] },
-      { id: 4, name: 'עזריאלי', lat: 32.0744, lng: 34.7922, lines: ['51', '82', '480', '405'] },
-      { id: 5, name: 'תחנה מרכזית ת"א', lat: 32.0561, lng: 34.7817, lines: ['5', '51', '82', '142', '480'] },
-      { id: 6, name: 'כיכר רבין', lat: 32.0804, lng: 34.7810, lines: ['18', '25', '72'] },
-      { id: 7, name: 'נמל תל אביב', lat: 32.0972, lng: 34.7714, lines: ['5', '25'] },
-      { id: 8, name: 'אבן גבירול / ארלוזורוב', lat: 32.0867, lng: 34.7819, lines: ['18', '25', '72', '89'] },
+      { id: 1, name: 'דיזנגוף סנטר', lat: 32.0753, lng: 34.7751, lines: ['5', '18', '25', '72', '61'] },
+      { id: 2, name: 'אלנבי / רוטשילד', lat: 32.0667, lng: 34.7724, lines: ['5', '25', '82', '10'] },
+      { id: 3, name: 'תחנת רכבת השלום', lat: 32.0725, lng: 34.7925, lines: ['142', '240', '480', '531'] },
+      { id: 4, name: 'עזריאלי', lat: 32.0744, lng: 34.7922, lines: ['51', '82', '480', '405', '400'] },
+      { id: 5, name: 'תחנה מרכזית ת"א', lat: 32.0561, lng: 34.7817, lines: ['5', '51', '82', '142', '480', '400', '405'] },
+      { id: 6, name: 'כיכר רבין', lat: 32.0804, lng: 34.7810, lines: ['18', '25', '72', '89'] },
+      { id: 7, name: 'נמל תל אביב', lat: 32.0972, lng: 34.7714, lines: ['5', '25', '10'] },
+      { id: 8, name: 'אבן גבירול / ארלוזורוב', lat: 32.0867, lng: 34.7819, lines: ['18', '25', '72', '89', '61'] },
+      { id: 9, name: 'רכבת סבידור מרכז', lat: 32.0904, lng: 34.7971, lines: ['61', '531', '72'] },
+      { id: 10, name: 'בית החולים איכילוב', lat: 32.0792, lng: 34.7887, lines: ['10', '72', '89'] },
+      { id: 11, name: 'קניון רמת אביב', lat: 32.1133, lng: 34.8044, lines: ['25', '89', '127'] },
+      { id: 12, name: 'הבורסה רמת גן', lat: 32.0850, lng: 34.8120, lines: ['18', '51', '61', '531'] },
     ];
 
     const busLines = [
-      { line: '18', op: 'kavim', dest: 'רמת גן - בורסה', from: 'תל אביב - דיזנגוף', eta: 3, stops: ['דיזנגוף סנטר', 'כיכר רבין', 'אבן גבירול / ארלוזורוב', 'רמת גן - בורסה'] },
+      { line: '18', op: 'kavim', dest: 'רמת גן - בורסה', from: 'כיכר מודיעין', eta: 3, stops: ['כיכר מודיעין', 'דיזנגוף סנטר', 'כיכר רבין', 'אבן גבירול / ארלוזורוב', 'הבורסה רמת גן'] },
       { line: '5', op: 'dan', dest: 'רכבת ההגנה', from: 'נמל תל אביב', eta: 5, stops: ['נמל תל אביב', 'דיזנגוף סנטר', 'אלנבי / רוטשילד', 'תחנה מרכזית ת"א', 'רכבת ההגנה'] },
       { line: '142', op: 'metropolin', dest: 'ראשון לציון', from: 'תחנת רכבת השלום', eta: 8, stops: ['תחנת רכבת השלום', 'תחנה מרכזית ת"א', 'חולון', 'ראשון לציון'] },
       { line: '480', op: 'egged', dest: 'ירושלים', from: 'עזריאלי', eta: 12, stops: ['עזריאלי', 'תחנה מרכזית ת"א', 'שער הגיא', 'ירושלים - תחנה מרכזית'] },
-      { line: '51', op: 'dan', dest: 'פתח תקווה', from: 'עזריאלי', eta: 6, stops: ['עזריאלי', 'בני ברק', 'פתח תקווה - מרכז', 'פתח תקווה - סגולה'] },
-      { line: '25', op: 'dan', dest: 'בת ים', from: 'נמל תל אביב', eta: 4, stops: ['נמל תל אביב', 'דיזנגוף סנטר', 'כיכר רבין', 'יפו', 'בת ים'] },
+      { line: '51', op: 'dan', dest: 'פתח תקווה', from: 'עזריאלי', eta: 6, stops: ['עזריאלי', 'הבורסה רמת גן', 'בני ברק', 'פתח תקווה - מרכז'] },
+      { line: '25', op: 'dan', dest: 'בת ים', from: 'קניון רמת אביב', eta: 4, stops: ['קניון רמת אביב', 'אבן גבירול / ארלוזורוב', 'דיזנגוף סנטר', 'יפו', 'בת ים'] },
+      { line: '10', op: 'dan', dest: 'נמל תל אביב', from: 'בת ים', eta: 7, stops: ['בת ים', 'אלנבי / רוטשילד', 'בית החולים איכילוב', 'נמל תל אביב'] },
+      { line: '61', op: 'kavim', dest: 'הבורסה רמת גן', from: 'תל אביב', eta: 5, stops: ['דיזנגוף סנטר', 'אבן גבירול / ארלוזורוב', 'רכבת סבידור מרכז', 'הבורסה רמת גן'] },
+      { line: '72', op: 'dan', dest: 'אוניברסיטת תל אביב', from: 'יפו', eta: 6, stops: ['יפו', 'דיזנגוף סנטר', 'כיכר רבין', 'בית החולים איכילוב', 'רכבת סבידור מרכז'] },
+      { line: '400', op: 'egged', dest: 'באר שבע', from: 'עזריאלי', eta: 15, stops: ['עזריאלי', 'תחנה מרכזית ת"א', 'אשדוד', 'באר שבע'] },
+      { line: '405', op: 'egged', dest: 'ירושלים', from: 'עזריאלי', eta: 10, stops: ['עזריאלי', 'מודיעין', 'ירושלים - תחנה מרכזית'] },
+      { line: '531', op: 'metropolin', dest: 'כפר סבא', from: 'תחנת רכבת השלום', eta: 9, stops: ['תחנת רכבת השלום', 'רכבת סבידור מרכז', 'הרצליה', 'רעננה', 'כפר סבא'] },
     ];
 
     let map, userLocation, userMarker;
@@ -533,10 +543,10 @@
     }
 
     function getOperatorForLine(line) {
-      if (['18', '7', '141', '89'].includes(line)) return OPERATORS.kavim;
-      if (['5', '12', '25', '51', '72', '82'].includes(line)) return OPERATORS.dan;
-      if (['142', '240', '301'].includes(line)) return OPERATORS.metropolin;
-      if (['480', '405'].includes(line)) return OPERATORS.egged;
+      if (['18', '61', '7', '141', '89'].includes(line)) return OPERATORS.kavim;
+      if (['5', '10', '12', '25', '51', '72', '82', '127'].includes(line)) return OPERATORS.dan;
+      if (['142', '240', '301', '531'].includes(line)) return OPERATORS.metropolin;
+      if (['480', '400', '405'].includes(line)) return OPERATORS.egged;
       return OPERATORS.dan;
     }
 
