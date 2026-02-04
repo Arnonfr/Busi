@@ -463,6 +463,7 @@
     function renderRecommendedLines() {
       document.getElementById('recommendedLines').innerHTML = busLines.slice(0, 4).map(bus => {
         const op = OPERATORS[bus.op];
+        const isFav = favorites.lines.includes(bus.line);
         return `
           <div class="line-card" onclick="trackBus(busLines.find(b=>b.line==='${bus.line}'))">
             <div class="line-icon" style="background:${op.hex}">
@@ -474,20 +475,28 @@
               <div class="line-from">${bus.from}</div>
             </div>
             <div class="line-eta">${bus.eta} דק'</div>
+            <button onclick="toggleFavoriteLine('${bus.line}',event)" style="background:none;border:none;cursor:pointer;padding:4px">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="${isFav ? '#fbbf24' : 'none'}" stroke="${isFav ? '#fbbf24' : '#999'}" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </button>
           </div>
         `;
       }).join('');
     }
 
     function renderNearbyStops() {
-      document.getElementById('nearbyStops').innerHTML = realStops.slice(0, 3).map(stop => `
+      document.getElementById('nearbyStops').innerHTML = realStops.slice(0, 3).map(stop => {
+        const isFav = favorites.stops.includes(stop.id);
+        return `
         <div class="stop-card" onclick="map.setCenter({lat:${stop.lat},lng:${stop.lng}});map.setZoom(17)">
           <div class="stop-name">${stop.name}</div>
           <div class="stop-lines">
             ${stop.lines.slice(0, 4).map(l => `<span class="stop-line-badge" style="background:${getOperatorForLine(l).hex}">${l}</span>`).join('')}
           </div>
+          <button onclick="toggleFavoriteStop(${stop.id},event)" style="background:none;border:none;cursor:pointer;padding:4px;margin-right:auto">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="${isFav ? '#fbbf24' : 'none'}" stroke="${isFav ? '#fbbf24' : '#999'}" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
         </div>
-      `).join('');
+      `}).join('');
     }
 
     function renderFavorites() {
@@ -547,10 +556,70 @@
     function openSearch() { document.getElementById('searchModal').classList.add('open'); document.getElementById('searchInput').focus(); }
     function closeSearch() { document.getElementById('searchModal').classList.remove('open'); }
     function searchFor(q) { closeSearch(); map.setCenter(realStops.find(s => s.name.includes(q))?.lat ? { lat: realStops.find(s => s.name.includes(q)).lat, lng: realStops.find(s => s.name.includes(q)).lng } : userLocation); }
-    function handleSearch(v) {}
+    function handleSearch(v) {
+      const results = document.getElementById('searchResults');
+      if (!v.trim()) {
+        results.innerHTML = `
+          <div class="section-title" style="margin-bottom:12px">חיפושים אחרונים</div>
+          <div id="recentSearches"></div>
+        `;
+        renderRecentSearches();
+        return;
+      }
+
+      // Search stops
+      const matchingStops = realStops.filter(s => s.name.includes(v) || s.lines.some(l => l.includes(v)));
+      // Search lines
+      const matchingLines = busLines.filter(b => b.line.includes(v) || b.dest.includes(v) || b.from.includes(v));
+
+      let html = '';
+      if (matchingLines.length > 0) {
+        html += `<div class="section-title" style="margin-bottom:12px">קווים</div>`;
+        html += matchingLines.map(bus => {
+          const op = OPERATORS[bus.op];
+          return `<div class="stop-card" onclick="closeSearch();trackBus(busLines.find(b=>b.line==='${bus.line}'))">
+            <span class="line-badge" style="background:${op.hex};margin-left:12px">${bus.line}</span>
+            <div class="stop-name">${bus.dest}</div>
+          </div>`;
+        }).join('');
+      }
+      if (matchingStops.length > 0) {
+        html += `<div class="section-title" style="margin:16px 0 12px">תחנות</div>`;
+        html += matchingStops.map(stop => `
+          <div class="stop-card" onclick="closeSearch();map.setCenter({lat:${stop.lat},lng:${stop.lng}});map.setZoom(17)">
+            <div class="stop-name">${stop.name}</div>
+            <div class="stop-lines">${stop.lines.slice(0, 4).map(l => `<span class="stop-line-badge" style="background:${getOperatorForLine(l).hex}">${l}</span>`).join('')}</div>
+          </div>
+        `).join('');
+      }
+      if (!html) {
+        html = '<div style="text-align:center;color:#666;padding:40px">לא נמצאו תוצאות</div>';
+      }
+      results.innerHTML = html;
+    }
     function toggleSheet() { document.getElementById('bottomSheet').classList.toggle('expanded'); }
     function toggleAlerts() { alert('התראות - בקרוב!'); }
     function toggleList() { document.getElementById('bottomSheet').classList.add('expanded'); }
+
+    function toggleFavoriteLine(line, e) {
+      e.stopPropagation();
+      const idx = favorites.lines.indexOf(line);
+      if (idx > -1) favorites.lines.splice(idx, 1);
+      else favorites.lines.push(line);
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+      renderRecommendedLines();
+      renderFavorites();
+    }
+
+    function toggleFavoriteStop(stopId, e) {
+      e.stopPropagation();
+      const idx = favorites.stops.indexOf(stopId);
+      if (idx > -1) favorites.stops.splice(idx, 1);
+      else favorites.stops.push(stopId);
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+      renderNearbyStops();
+      renderFavorites();
+    }
   </script>
   <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyADe3KkvxOYMdcRBXYucetkHf7u9iRXxmc&callback=initMap"></script>
 </body>
